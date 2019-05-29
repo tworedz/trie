@@ -4,12 +4,10 @@ class Trie:
         self.children = []
         self.end_of_word = False
         self.word = ''
-        self.counter = 1
 
     def __repr__(self):
         return f'{self.char} - {self.children}'
 
-    # @staticmethod
     def put(self, word: str):
         node = self
 
@@ -17,7 +15,6 @@ class Trie:
             found_in_child = False
             for child in node.children:
                 if child.char == char:
-                    child.counter += 1
                     node = child
                     found_in_child = True
                     break
@@ -41,22 +38,17 @@ class Trie:
                     char_not_found = False
                     node = child
                     break
-
             if char_not_found:
-                print(123)
                 return 0
 
-        # if node.counter < 20:
         words = []
         Trie.get_words(node, words)
-        # print(words)
-        return node.counter, words
+        words = sorted(words)
+        return words
 
     @staticmethod
     def get_words(node, words):
         for child in node.children:
             if child.end_of_word:
                 words.append(child.word)
-                # node = child
             Trie.get_words(child, words)
-

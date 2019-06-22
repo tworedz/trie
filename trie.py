@@ -1,29 +1,27 @@
 class Trie:
-    def __init__(self, char: str):
-        self.char = char
-        self.children = []
-        self.end_of_word = False
+    def __init__(self):
+        self.children = {}
+        self.end_of_word = 0
         self.word = ''
 
     def __repr__(self):
-        return f'{self.char} - {self.children}'
+        return f'{self.word} {self.end_of_word}'
 
-    def put(self, word: str):
+    def __str__(self):
+        return self.__repr__()
+
+    def put(self, word: str, cnt=1):
         node = self
 
         for char in word:
-            found_in_child = False
-            for child in node.children:
-                if child.char == char:
-                    node = child
-                    found_in_child = True
-                    break
-
-            if not found_in_child:
-                new_node = Trie(char)
-                node.children.append(new_node)
+            child = node.children.get(char)
+            if child:
+                node = child
+            else:
+                new_node = Trie()
+                node.children[char] = new_node
                 node = new_node
-        node.end_of_word = True
+        node.end_of_word += int(cnt)
         node.word = word
 
     def get(self, prefix: str):
@@ -32,23 +30,22 @@ class Trie:
             return 0
 
         for char in prefix:
-            char_not_found = True
-            for child in node.children:
-                if child.char == char:
-                    char_not_found = False
-                    node = child
-                    break
-            if char_not_found:
+            child = node.children.get(char)
+            if child:
+                node = child
+            else:
                 return 0
 
         words = []
+        if node.end_of_word:
+            words.append(node)
         Trie.get_words(node, words)
-        words = sorted(words)
+        words = sorted(words, key=lambda x: x.end_of_word, reverse=True)
         return words
 
     @staticmethod
     def get_words(node, words):
-        for child in node.children:
+        for child in node.children.values():
             if child.end_of_word:
-                words.append(child.word)
+                words.append(child)
             Trie.get_words(child, words)
